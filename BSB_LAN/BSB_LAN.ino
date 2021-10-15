@@ -5345,8 +5345,12 @@ void loop() {
           c = 0;
           bus->Send(TYPE_IQ1, c, msg, tx_msg);
           int IA1_max = (msg[7+bus->getBusType()*4] << 8) + msg[8+bus->getBusType()*4];
+          Serial.println(F("IA1_max:"));
+          Serial.println(IA1_max);
           bus->Send(TYPE_IQ2, c, msg, tx_msg);
           int IA2_max = (msg[5+bus->getBusType()*4] << 8) + msg[6+bus->getBusType()*4];
+          Serial.println(F("IA2_max:"));
+          Serial.println(IA2_max);
           int outBufLen = strlen(outBuf);
 
           for (int IA1_counter = 1; IA1_counter <= IA1_max; IA1_counter++) {
