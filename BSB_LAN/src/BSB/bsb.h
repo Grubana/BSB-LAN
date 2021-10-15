@@ -51,7 +51,7 @@ public:
   uint8_t getPl_start();
   uint8_t getLen_idx();
 
-  bool Send(uint8_t type, uint32_t cmd, byte* rx_msg, byte* tx_msg, byte* param=NULL, byte param_len=0, bool wait_for_reply=true);
+  bool Send(uint8_t type, uint32_t cmd, byte* rx_msg, byte* tx_msg, byte* param=NULL, byte param_len=0, bool wait_for_reply=true, uint32_t timeoutMs = 3000);
 
 private:
   boolean HwSerial = false;
