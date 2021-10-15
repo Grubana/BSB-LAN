@@ -5189,7 +5189,7 @@ void loop() {
 
           flushToWebClient();
 
-          uint8_t found_ids[10] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+          /*uint8_t found_ids[10] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
           if (bus->Send(TYPE_QINF, 0x053D0002, msg, tx_msg, NULL, 0, false)) {
             unsigned long startquery = millis();
             while (millis() - startquery < 10000) {
@@ -5221,8 +5221,8 @@ void loop() {
             }
           } else {
             printToWebClient(PSTR(MENU_TEXT_QFA "!"));
-          }
-
+          }*/
+/*
           for (int x=0;x<10;x++) {
             if (found_ids[x]==0xFF) {
               continue;
@@ -5337,9 +5337,9 @@ void loop() {
             }
             printToWebClient(PSTR("\r\n" MENU_TEXT_QTE ".\r\n"));
             flushToWebClient();
-          }
+          }*/
 
-          bus->setBusType(bus->getBusType(), myAddr, destAddr);   // return to original destination address
+         // bus->setBusType(bus->getBusType(), myAddr, destAddr);   // return to original destination address
 
           printToWebClient(PSTR("\r\nComplete dump:\r\n"));
           c = 0;
