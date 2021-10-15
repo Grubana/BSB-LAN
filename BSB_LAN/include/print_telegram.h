@@ -773,6 +773,27 @@ void tryDecode(byte* msg, byte data_len){
   
   decodedTelegram.value[0] = '\0';
   decodedTelegram.error = 0;   
+
+  if (data_len > 0) {
+    if (msg[bus->getPl_start()]!=0) {
+      msg[bus->getPl_start() + data_len]='\0'; // write terminating zero
+      printToDebug((char*)&msg[bus->getPl_start()]);
+      strcpy(decodedTelegram.value,(char*)&msg[bus->getPl_start()]);
+      remove_char(decodedTelegram.value, '\'');
+    } else {
+      strcpy_P(decodedTelegram.value,PSTR("-"));
+    }
+      printToDebug(decodedTelegram.value);
+  } else {
+    printToDebug(PSTR(" VT_STRING len == 0: "));
+    prepareToPrintHumanReadableTelegram(msg, data_len, bus->getPl_start());
+    decodedTelegram.error = 256;
+  }
+  Serial.print("String: ");
+  Serial.print(decodedTelegram.value);
+  Serial.print(" (");
+  Serial.print(decodedTelegram.error);
+  Serial.println(")");
               
               /*
             case VT_WEEKDAY:
@@ -849,21 +870,7 @@ void tryDecode(byte* msg, byte data_len){
               break;
             }
             case VT_STRING: // string
-              if (data_len > 0) {
-                if (msg[bus->getPl_start()]!=0) {
-                  msg[bus->getPl_start() + data_len]='\0'; // write terminating zero
-                  printToDebug((char*)&msg[bus->getPl_start()]);
-                  strcpy(decodedTelegram.value,(char*)&msg[bus->getPl_start()]);
-                  remove_char(decodedTelegram.value, '\'');
-                } else {
-                  strcpy_P(decodedTelegram.value,PSTR("-"));
-                }
-                 printToDebug(decodedTelegram.value);
-              } else {
-                printToDebug(PSTR(" VT_STRING len == 0: "));
-                prepareToPrintHumanReadableTelegram(msg, data_len, bus->getPl_start());
-                decodedTelegram.error = 256;
-                }
+              
               break;
             case VT_PPS_TIME: // PPS: Time and day of week
             {
