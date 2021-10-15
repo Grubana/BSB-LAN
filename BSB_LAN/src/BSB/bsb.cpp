@@ -133,7 +133,7 @@ void BSB::print(byte* msg) {
       Serial.print(data, HEX);
       Serial.print(" ");
     }
-    Serial.println();
+    Serial.println(" ");
   }
 }
 
@@ -183,14 +183,14 @@ bool BSB::GetMessage(byte* msg) {
     // Read serial data...
     read = readByte();
 
-#if DEBUG_LL
+/*#if DEBUG_LL
     Serial.println();    
     if(read<16){  
       Serial.print("0");
     }
     Serial.print(read, HEX);
     Serial.print(" ");
-#endif    
+#endif   */
     
     // ... until SOF detected (= 0xDC, 0xDE bei BSB bzw. 0x78 bei LPB)
     if ((bus_type == 0 && (read == 0xDC || read == 0xDE)) || (bus_type == 1 && read == 0x78) || (bus_type == 2 && (read == 0x17 || read == 0x1D || read == 0x1E  || read == 0xF8  || read == 0xFB || read == 0xFD || read == 0xFE))) {
@@ -383,6 +383,7 @@ inline bool BSB::_send(byte* msg) {
   }
 
 #if DEBUG_LL  
+  Serial.print("Sending message: ");
   print(msg);
 #endif  
   static const unsigned long timeoutabort = 1000;  // one second timeout
@@ -613,10 +614,12 @@ bool BSB::Send(uint8_t type, uint32_t cmd, byte* rx_msg, byte* tx_msg, byte* par
 	}
 */
         if (rx_msg[2] == myAddr && rx_msg[9] == A2 && rx_msg[10] == A1 && rx_msg[11] == A3 && rx_msg[12] == A4) {
+          Serial.print(F("Message received: "));
+          print(rx_msg);
           return true;
 	      } else {
 #if DEBUG_LL
-          Serial.println(F("Message received, but not for us:"));
+          Serial.print(F("Message received, but not for us: "));
           print(rx_msg);
 #endif
         }
@@ -625,7 +628,7 @@ bool BSB::Send(uint8_t type, uint32_t cmd, byte* rx_msg, byte* tx_msg, byte* par
           return true;
 	      } else {
 #if DEBUG_LL
-          Serial.println(F("Message received, but not for us:"));
+          Serial.print(F("Message received, but not for us: "));
           print(rx_msg);
 #endif
         }
@@ -636,7 +639,7 @@ bool BSB::Send(uint8_t type, uint32_t cmd, byte* rx_msg, byte* tx_msg, byte* par
     }
   }
 #if DEBUG_LL
-  Serial.println(F("No answer for this send telegram:"));
+  Serial.println(F("No answer for this sent telegram:"));
 #endif
   print(tx_msg);
 
