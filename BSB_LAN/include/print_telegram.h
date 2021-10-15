@@ -639,7 +639,7 @@ void tryDecode(byte* msg, byte data_len){
   Serial.println(")");
 
 
-  decodedTelegram.value = {'\0'};
+  decodedTelegram.value[0] = '\0';
   decodedTelegram.error = 0;    
 
   printBYTE(msg,data_len);
@@ -650,7 +650,7 @@ void tryDecode(byte* msg, byte data_len){
   Serial.println(")");
 
   
-  decodedTelegram.value = {'\0'};
+  decodedTelegram.value[0] = '\0';
   decodedTelegram.error = 0;   
            
   printWORD(msg,data_len,decodedTelegram.operand);
@@ -661,7 +661,7 @@ void tryDecode(byte* msg, byte data_len){
   Serial.println(")");
 
   
-  decodedTelegram.value = {'\0'};
+  decodedTelegram.value[0] = '\0';
   decodedTelegram.error = 0;   
            
   printDWORD(msg,data_len,decodedTelegram.operand);
@@ -672,7 +672,7 @@ void tryDecode(byte* msg, byte data_len){
   Serial.println(")");
 
   
-  decodedTelegram.value = {'\0'};
+  decodedTelegram.value[0] = '\0';
   decodedTelegram.error = 0;   
            
   printSINT(msg,data_len,decodedTelegram.operand);
@@ -683,7 +683,7 @@ void tryDecode(byte* msg, byte data_len){
   Serial.println(")");
 
   
-  decodedTelegram.value = {'\0'};
+  decodedTelegram.value[0] = '\0';
   decodedTelegram.error = 0;   
            
   printFIXPOINT_BYTE(msg,data_len,decodedTelegram.operand,decodedTelegram.precision);
@@ -694,7 +694,7 @@ void tryDecode(byte* msg, byte data_len){
   Serial.println(")");
 
   
-  decodedTelegram.value = {'\0'};
+  decodedTelegram.value[0] = '\0';
   decodedTelegram.error = 0;   
            
   printFIXPOINT_BYTE_US(msg,data_len,decodedTelegram.operand,decodedTelegram.precision);
@@ -705,7 +705,7 @@ void tryDecode(byte* msg, byte data_len){
   Serial.println(")");
 
   
-  decodedTelegram.value = {'\0'};
+  decodedTelegram.value[0] = '\0';
   decodedTelegram.error = 0;   
            
   printFIXPOINT(msg,data_len,decodedTelegram.operand,decodedTelegram.precision);
@@ -716,7 +716,7 @@ void tryDecode(byte* msg, byte data_len){
   Serial.println(")");
 
   
-  decodedTelegram.value = {'\0'};
+  decodedTelegram.value[0] = '\0';
   decodedTelegram.error = 0;   
            
   printCHOICE(msg,data_len, decodedTelegram.enumstr, decodedTelegram.enumstr_len);
@@ -727,7 +727,7 @@ void tryDecode(byte* msg, byte data_len){
   Serial.println(")");
 
   
-  decodedTelegram.value = {'\0'};
+  decodedTelegram.value[0] = '\0';
   decodedTelegram.error = 0;   
            
   printLPBAddr(msg,data_len);
@@ -738,7 +738,7 @@ void tryDecode(byte* msg, byte data_len){
   Serial.println(")");
 
   
-  decodedTelegram.value = {'\0'};
+  decodedTelegram.value[0] = '\0';
   decodedTelegram.error = 0;   
            
   printTime(msg,data_len);
@@ -749,7 +749,7 @@ void tryDecode(byte* msg, byte data_len){
   Serial.println(")");
 
   
-  decodedTelegram.value = {'\0'};
+  decodedTelegram.value[0] = '\0';
   decodedTelegram.error = 0;   
            
   printDateTime(msg,data_len, decodedTelegram.type);
@@ -760,7 +760,7 @@ void tryDecode(byte* msg, byte data_len){
   Serial.println(")");
 
   
-  decodedTelegram.value = {'\0'};
+  decodedTelegram.value[0] = '\0';
   decodedTelegram.error = 0;   
            
   printTimeProg(msg,data_len);
@@ -771,7 +771,7 @@ void tryDecode(byte* msg, byte data_len){
   Serial.println(")");
 
   
-  decodedTelegram.value = {'\0'};
+  decodedTelegram.value[0] = '\0';
   decodedTelegram.error = 0;   
               
               /*
