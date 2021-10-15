@@ -529,7 +529,7 @@ UART buffer gefüllt ist und ein empfangenes Byte meldet.
   return true;
 }
 
-bool BSB::Send(uint8_t type, uint32_t cmd, byte* rx_msg, byte* tx_msg, byte* param, byte param_len, bool wait_for_reply) {
+bool BSB::Send(uint8_t type, uint32_t cmd, byte* rx_msg, byte* tx_msg, byte* param, byte param_len, bool wait_for_reply, uint16_t timeoutMs = 3000) {
   byte i;
   byte offset = 0;
 
@@ -595,12 +595,12 @@ bool BSB::Send(uint8_t type, uint32_t cmd, byte* rx_msg, byte* tx_msg, byte* par
 
   i=15;
 
-  unsigned long timeout = millis() + 500;
+  unsigned long timeout = millis() + timeoutMs;
   while ((i > 0) && (millis() < timeout)) {
     if (GetMessage(rx_msg)) {
 #if DEBUG_LL
       Serial.print(F("Duration until answer received: "));
-      Serial.println(500-(timeout-millis()));
+      Serial.println(timeoutMs-(timeout-millis()));
 #endif
       i--;
       byte msg_type = rx_msg[4+(bus_type*4)];
