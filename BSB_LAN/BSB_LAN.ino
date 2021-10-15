@@ -5404,6 +5404,13 @@ void loop() {
             }
             // Decode the rcv telegram and send it to the PC serial interface
             printTelegram(msg, -1);   // send to hardware serial interface
+            int data_len = 0;
+            if (decodedTelegram.msg_type < 0x12) {
+              data_len=msg[bus->getLen_idx()]-14;     // get packet length, then subtract
+            } else {
+              data_len=msg[bus->getLen_idx()]-7;      // for yet unknow telegram types 0x12 to 0x15
+            }
+            tryDecode(msg, data_len);
 #ifdef LOGGER
             LogTelegram(msg);
 #endif

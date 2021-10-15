@@ -630,6 +630,226 @@ void loadCategoryDescAddr() {
   decodedTelegram.value[0] = 0; //VERY IMPORTANT: reset result before decoding, in other case in case of error value from printENUM will be showed as correct value.
 }
 
+void tryDecode(byte* msg, byte data_len){
+  printBIT(msg,data_len);
+  Serial.print("Bit: ");
+  Serial.print(decodedTelegram.value);
+  Serial.print(" (");
+  Serial.print(decodedTelegram.error);
+  Serial.print(")");
+           
+  printBYTE(msg,data_len);
+  Serial.print("Byte: ");
+  Serial.print(decodedTelegram.value);
+  Serial.print(" (");
+  Serial.print(decodedTelegram.error);
+  Serial.print(")");
+           
+  printWORD(msg,data_len,decodedTelegram.operand);
+  Serial.print("Word: ");
+  Serial.print(decodedTelegram.value);
+  Serial.print(" (");
+  Serial.print(decodedTelegram.error);
+  Serial.print(")");
+           
+  printDWORD(msg,data_len,decodedTelegram.operand);
+  Serial.print("DWord: ");
+  Serial.print(decodedTelegram.value);
+  Serial.print(" (");
+  Serial.print(decodedTelegram.error);
+  Serial.print(")");
+           
+  printSINT(msg,data_len,decodedTelegram.operand);
+  Serial.print("SInt: ");
+  Serial.print(decodedTelegram.value);
+  Serial.print(" (");
+  Serial.print(decodedTelegram.error);
+  Serial.print(")");
+           
+  printFIXPOINT_BYTE(msg,data_len,decodedTelegram.operand,decodedTelegram.precision);
+  Serial.print("FIXPOINT_BYTE: ");
+  Serial.print(decodedTelegram.value);
+  Serial.print(" (");
+  Serial.print(decodedTelegram.error);
+  Serial.print(")");
+           
+  printFIXPOINT_BYTE_US(msg,data_len,decodedTelegram.operand,decodedTelegram.precision);
+  Serial.print("FIXPOINT_BYTE_US: ");
+  Serial.print(decodedTelegram.value);
+  Serial.print(" (");
+  Serial.print(decodedTelegram.error);
+  Serial.print(")");
+           
+  printFIXPOINT(msg,data_len,decodedTelegram.operand,decodedTelegram.precision);
+  Serial.print("FIXPOINT: ");
+  Serial.print(decodedTelegram.value);
+  Serial.print(" (");
+  Serial.print(decodedTelegram.error);
+  Serial.print(")");
+           
+  printCHOICE(msg,data_len, decodedTelegram.enumstr, decodedTelegram.enumstr_len);
+  Serial.print("CHOICE: ");
+  Serial.print(decodedTelegram.value);
+  Serial.print(" (");
+  Serial.print(decodedTelegram.error);
+  Serial.print(")");
+           
+  printLPBAddr(msg,data_len);
+  Serial.print("LPBAddr: ");
+  Serial.print(decodedTelegram.value);
+  Serial.print(" (");
+  Serial.print(decodedTelegram.error);
+  Serial.print(")");
+           
+  printTime(msg,data_len);
+  Serial.print("Time: ");
+  Serial.print(decodedTelegram.value);
+  Serial.print(" (");
+  Serial.print(decodedTelegram.error);
+  Serial.print(")");
+           
+  printDateTime(msg,data_len, decodedTelegram.type);
+  Serial.print("DateTime: ");
+  Serial.print(decodedTelegram.value);
+  Serial.print(" (");
+  Serial.print(decodedTelegram.error);
+  Serial.print(")");
+           
+  printTimeProg(msg,data_len);
+  Serial.print("TimeProg: ");
+  Serial.print(decodedTelegram.value);
+  Serial.print(" (");
+  Serial.print(decodedTelegram.error);
+  Serial.print(")");
+              
+              /*
+            case VT_WEEKDAY:
+            case VT_ENUM: // enum
+              if (data_len == 2 || data_len == 3 || bus->getBusType() == BUS_PPS) {
+                if ((msg[bus->getPl_start()]==0 && data_len==2) || (msg[bus->getPl_start()]==0 && data_len==3) || (bus->getBusType() == BUS_PPS)) {
+                  if (decodedTelegram.enumstr!=0) {
+                    if (data_len == 2) {
+                      printENUM(decodedTelegram.enumstr,decodedTelegram.enumstr_len,msg[bus->getPl_start()+1],1);
+                    } else {                            // Fujitsu: data_len == 3
+                      uint8_t pps_offset = 0;
+                      if (bus->getBusType() == BUS_PPS) pps_offset = 1;
+                      printENUM(decodedTelegram.enumstr,decodedTelegram.enumstr_len,msg[bus->getPl_start()+2-pps_offset],1);
+                    }
+                  } else {
+                    decodedTelegram.error = 259;
+                    printToDebug(printError(decodedTelegram.error));
+                    SerialPrintData(msg);
+                  }
+                } else {
+                  strcpy_P(decodedTelegram.value, PSTR("65535"));
+#if defined(__AVR__)
+                  decodedTelegram.enumdescaddr = pgm_get_far_address(STR_DISABLED);
+#else
+                  decodedTelegram.enumdescaddr = STR_DISABLED;
+#endif
+//                  undefinedValueToBuffer(decodedTelegram.value);
+                  printToDebug(decodedTelegram.value);
+                }
+              } else {
+                printToDebug(PSTR(" VT_ENUM len !=2 && len != 3: "));
+                prepareToPrintHumanReadableTelegram(msg, data_len, bus->getPl_start());
+                decodedTelegram.error = 256;
+                }
+              break;
+            case VT_CUSTOM_ENUM: // custom enum - extract information from a telegram that contains more than one kind of information/data. First byte of the ENUM is the index to the payload where the data is located. This will then be used as data to be displayed/evaluated.
+            {
+              if (decodedTelegram.enumstr!=0) {
+                uint8_t idx = pgm_read_byte_far(decodedTelegram.enumstr+0);
+                printCustomENUM(decodedTelegram.enumstr,decodedTelegram.enumstr_len,msg[bus->getPl_start()+idx],1);
+              } else {
+                decodedTelegram.error = 259;
+                printToDebug(printError(decodedTelegram.error));
+                SerialPrintData(msg);
+              }
+              break;
+            }
+            case VT_CUSTOM_BYTE: // custom byte
+            {
+              if (decodedTelegram.enumstr!=0) {
+                uint8_t idx = pgm_read_byte_far(decodedTelegram.enumstr+0);
+                uint8_t len = pgm_read_byte_far(decodedTelegram.enumstr+1);
+                uint32_t val = 0;
+                for (int x=0; x<len; x++) {
+                  val = val + ((uint32_t)msg[bus->getPl_start()+idx+x] << (8*(len-1-x)));
+                }
+#if !defined(ESP32)
+                sprintf_P(decodedTelegram.value,PSTR("%lu"),val);
+#else
+                sprintf_P(decodedTelegram.value,PSTR("%u"),val);
+#endif
+                printToDebug(decodedTelegram.value);
+              } else {
+                decodedTelegram.error = 259;
+                printToDebug(printError(decodedTelegram.error));
+                SerialPrintData(msg);
+              }
+              break;
+            }
+            case VT_CUSTOM_BIT: // u8
+            {
+              uint8_t bit_index = (byte)pgm_read_byte_far(decodedTelegram.enumstr);
+              printCustomBIT(msg,bit_index);
+              break;
+            }
+            case VT_STRING: // string
+              if (data_len > 0) {
+                if (msg[bus->getPl_start()]!=0) {
+                  msg[bus->getPl_start() + data_len]='\0'; // write terminating zero
+                  printToDebug((char*)&msg[bus->getPl_start()]);
+                  strcpy(decodedTelegram.value,(char*)&msg[bus->getPl_start()]);
+                  remove_char(decodedTelegram.value, '\'');
+                } else {
+                  strcpy_P(decodedTelegram.value,PSTR("-"));
+                }
+                 printToDebug(decodedTelegram.value);
+              } else {
+                printToDebug(PSTR(" VT_STRING len == 0: "));
+                prepareToPrintHumanReadableTelegram(msg, data_len, bus->getPl_start());
+                decodedTelegram.error = 256;
+                }
+              break;
+            case VT_PPS_TIME: // PPS: Time and day of week
+            {
+              sprintf_P(decodedTelegram.value, PSTR("%02d:%02d:%02d"), hour(), minute(), second());
+              printToDebug(decodedTelegram.value);
+              break;
+            }
+            case VT_ERRORCODE: //  u16 or u8 (via OCI420)
+              if (data_len == 3 || data_len == 2) {
+                if (msg[bus->getPl_start()]==0) {
+                  long lval;
+                  if (data_len == 3) {
+                    lval=(long(msg[bus->getPl_start()+1])<<8)+long(msg[bus->getPl_start()+2]);
+                  } else {
+                    lval=long(msg[bus->getPl_start()+1]);
+                  }
+                  printENUM(decodedTelegram.enumstr, decodedTelegram.enumstr_len,lval,1);
+                } else {
+                  undefinedValueToBuffer(decodedTelegram.value);
+                  printToDebug(decodedTelegram.value);
+                }
+              } else {
+                printToDebug(PSTR(" VT_ERRORCODE len == 0: "));
+                prepareToPrintHumanReadableTelegram(msg, data_len, bus->getPl_start());
+                decodedTelegram.error = 256;
+                }
+              break;
+            case VT_UNKNOWN:
+            default:
+              prepareToPrintHumanReadableTelegram(msg, data_len, bus->getPl_start());
+              if (decodedTelegram.telegramDump)
+                strcpy(decodedTelegram.value, decodedTelegram.telegramDump);
+              decodedTelegram.error = 260;
+              break;
+*/
+
+}
+
 /** *****************************************************************
  *  Function:  printTelegram()
  *  Does:      Send the decoded telegram content to the hardware
