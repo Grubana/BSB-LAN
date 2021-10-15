@@ -595,12 +595,12 @@ bool BSB::Send(uint8_t type, uint32_t cmd, byte* rx_msg, byte* tx_msg, byte* par
 
   i=15;
 
-  unsigned long timeout = millis() + 3000;
+  unsigned long timeout = millis() + 500;
   while ((i > 0) && (millis() < timeout)) {
     if (GetMessage(rx_msg)) {
 #if DEBUG_LL
       Serial.print(F("Duration until answer received: "));
-      Serial.println(3000-(timeout-millis()));
+      Serial.println(500-(timeout-millis()));
 #endif
       i--;
       byte msg_type = rx_msg[4+(bus_type*4)];

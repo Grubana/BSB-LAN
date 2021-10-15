@@ -5354,18 +5354,20 @@ void loop() {
           int outBufLen = strlen(outBuf);
 
           for (int IA1_counter = 1; IA1_counter <= IA1_max; IA1_counter++) {
-            bus->Send(TYPE_IQ1, IA1_counter, msg, tx_msg);
-            bin2hex(outBuf + outBufLen, msg, msg[bus->getLen_idx()]+bus->getBusType(), ' ');
-            printToWebClient(outBuf + outBufLen);
-            printToWebClient(PSTR("\r\n"));
-            flushToWebClient();
+            if(bus->Send(TYPE_IQ1, IA1_counter, msg, tx_msg)){
+              bin2hex(outBuf + outBufLen, msg, msg[bus->getLen_idx()]+bus->getBusType(), ' ');
+              printToWebClient(outBuf + outBufLen);
+              printToWebClient(PSTR("\r\n"));
+              flushToWebClient();
+            }
           }
           for (int IA2_counter = 1; IA2_counter <= IA2_max; IA2_counter++) {
-            bus->Send(TYPE_IQ2, IA2_counter, msg, tx_msg);
-            bin2hex(outBuf + outBufLen, msg, msg[bus->getLen_idx()]+bus->getBusType(), ' ');
-            printToWebClient(outBuf + outBufLen);
-            printToWebClient(PSTR("\r\n"));
-            flushToWebClient();
+            if(bus->Send(TYPE_IQ2, IA2_counter, msg, tx_msg)){
+              bin2hex(outBuf + outBufLen, msg, msg[bus->getLen_idx()]+bus->getBusType(), ' ');
+              printToWebClient(outBuf + outBufLen);
+              printToWebClient(PSTR("\r\n"));
+              flushToWebClient();
+            }
           }
           outBuf[outBufLen] = 0;
           printToWebClient(PSTR("\r\n" MENU_TEXT_QFE ".\r\n"));
