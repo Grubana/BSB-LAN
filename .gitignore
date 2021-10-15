@@ -26,3 +26,5 @@ BSB_LAN/scripts/old
 BSB_LAN/scripts/match-vt_types.pl
 BSB_LAN/scripts/compare_levels.pl
 BSB_LAN/scripts/check_lang_doubles.pl
+
+.vscode/

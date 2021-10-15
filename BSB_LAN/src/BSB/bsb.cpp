@@ -10,7 +10,7 @@
 
 #include "bsb.h"
 
-//#define DEBUG_LL 1
+#define DEBUG_LL 1
 
 // Constructor
 BSB::BSB(uint8_t rx, uint8_t tx, uint8_t addr, uint8_t d_addr) {
