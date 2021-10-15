@@ -5354,7 +5354,7 @@ void loop() {
           int outBufLen = strlen(outBuf);
 
           for (int IA1_counter = 1; IA1_counter <= IA1_max; IA1_counter++) {
-            if(bus->Send(TYPE_IQ1, IA1_counter, msg, tx_msg, 300)){
+            if(bus->Send(TYPE_IQ1, IA1_counter, msg, tx_msg, NULL, 0, true, 300)){
               bin2hex(outBuf + outBufLen, msg, msg[bus->getLen_idx()]+bus->getBusType(), ' ');
               printToWebClient(outBuf + outBufLen);
               printToWebClient(PSTR("\r\n"));
@@ -5362,7 +5362,7 @@ void loop() {
             }
           }
           for (int IA2_counter = 1; IA2_counter <= IA2_max; IA2_counter++) {
-            if(bus->Send(TYPE_IQ2, IA2_counter, msg, tx_msg, 300)){
+            if(bus->Send(TYPE_IQ2, IA2_counter, msg, tx_msg, NULL, 0, true, 300)){
               bin2hex(outBuf + outBufLen, msg, msg[bus->getLen_idx()]+bus->getBusType(), ' ');
               printToWebClient(outBuf + outBufLen);
               printToWebClient(PSTR("\r\n"));
