@@ -636,91 +636,143 @@ void tryDecode(byte* msg, byte data_len){
   Serial.print(decodedTelegram.value);
   Serial.print(" (");
   Serial.print(decodedTelegram.error);
-  Serial.print(")");
-           
+  Serial.println(")");
+
+
+  decodedTelegram.value = {'\0'};
+  decodedTelegram.error = 0;    
+
   printBYTE(msg,data_len);
   Serial.print("Byte: ");
   Serial.print(decodedTelegram.value);
   Serial.print(" (");
   Serial.print(decodedTelegram.error);
-  Serial.print(")");
+  Serial.println(")");
+
+  
+  decodedTelegram.value = {'\0'};
+  decodedTelegram.error = 0;   
            
   printWORD(msg,data_len,decodedTelegram.operand);
   Serial.print("Word: ");
   Serial.print(decodedTelegram.value);
   Serial.print(" (");
   Serial.print(decodedTelegram.error);
-  Serial.print(")");
+  Serial.println(")");
+
+  
+  decodedTelegram.value = {'\0'};
+  decodedTelegram.error = 0;   
            
   printDWORD(msg,data_len,decodedTelegram.operand);
   Serial.print("DWord: ");
   Serial.print(decodedTelegram.value);
   Serial.print(" (");
   Serial.print(decodedTelegram.error);
-  Serial.print(")");
+  Serial.println(")");
+
+  
+  decodedTelegram.value = {'\0'};
+  decodedTelegram.error = 0;   
            
   printSINT(msg,data_len,decodedTelegram.operand);
   Serial.print("SInt: ");
   Serial.print(decodedTelegram.value);
   Serial.print(" (");
   Serial.print(decodedTelegram.error);
-  Serial.print(")");
+  Serial.println(")");
+
+  
+  decodedTelegram.value = {'\0'};
+  decodedTelegram.error = 0;   
            
   printFIXPOINT_BYTE(msg,data_len,decodedTelegram.operand,decodedTelegram.precision);
   Serial.print("FIXPOINT_BYTE: ");
   Serial.print(decodedTelegram.value);
   Serial.print(" (");
   Serial.print(decodedTelegram.error);
-  Serial.print(")");
+  Serial.println(")");
+
+  
+  decodedTelegram.value = {'\0'};
+  decodedTelegram.error = 0;   
            
   printFIXPOINT_BYTE_US(msg,data_len,decodedTelegram.operand,decodedTelegram.precision);
   Serial.print("FIXPOINT_BYTE_US: ");
   Serial.print(decodedTelegram.value);
   Serial.print(" (");
   Serial.print(decodedTelegram.error);
-  Serial.print(")");
+  Serial.println(")");
+
+  
+  decodedTelegram.value = {'\0'};
+  decodedTelegram.error = 0;   
            
   printFIXPOINT(msg,data_len,decodedTelegram.operand,decodedTelegram.precision);
   Serial.print("FIXPOINT: ");
   Serial.print(decodedTelegram.value);
   Serial.print(" (");
   Serial.print(decodedTelegram.error);
-  Serial.print(")");
+  Serial.println(")");
+
+  
+  decodedTelegram.value = {'\0'};
+  decodedTelegram.error = 0;   
            
   printCHOICE(msg,data_len, decodedTelegram.enumstr, decodedTelegram.enumstr_len);
   Serial.print("CHOICE: ");
   Serial.print(decodedTelegram.value);
   Serial.print(" (");
   Serial.print(decodedTelegram.error);
-  Serial.print(")");
+  Serial.println(")");
+
+  
+  decodedTelegram.value = {'\0'};
+  decodedTelegram.error = 0;   
            
   printLPBAddr(msg,data_len);
   Serial.print("LPBAddr: ");
   Serial.print(decodedTelegram.value);
   Serial.print(" (");
   Serial.print(decodedTelegram.error);
-  Serial.print(")");
+  Serial.println(")");
+
+  
+  decodedTelegram.value = {'\0'};
+  decodedTelegram.error = 0;   
            
   printTime(msg,data_len);
   Serial.print("Time: ");
   Serial.print(decodedTelegram.value);
   Serial.print(" (");
   Serial.print(decodedTelegram.error);
-  Serial.print(")");
+  Serial.println(")");
+
+  
+  decodedTelegram.value = {'\0'};
+  decodedTelegram.error = 0;   
            
   printDateTime(msg,data_len, decodedTelegram.type);
   Serial.print("DateTime: ");
   Serial.print(decodedTelegram.value);
   Serial.print(" (");
   Serial.print(decodedTelegram.error);
-  Serial.print(")");
+  Serial.println(")");
+
+  
+  decodedTelegram.value = {'\0'};
+  decodedTelegram.error = 0;   
            
   printTimeProg(msg,data_len);
   Serial.print("TimeProg: ");
   Serial.print(decodedTelegram.value);
   Serial.print(" (");
   Serial.print(decodedTelegram.error);
-  Serial.print(")");
+  Serial.println(")");
+
+  
+  decodedTelegram.value = {'\0'};
+  decodedTelegram.error = 0;   
               
               /*
             case VT_WEEKDAY:
