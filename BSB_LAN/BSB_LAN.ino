@@ -5410,7 +5410,7 @@ void loop() {
             } else {
               data_len=msg[bus->getLen_idx()]-7;      // for yet unknow telegram types 0x12 to 0x15
             }
-            const char* info = tryDecode(msg, data_len)
+            const char* info = tryDecode(msg, data_len);
             printToWebClient(info);
             free((char*)info);
             printToWebClient(PSTR("<br>"));
