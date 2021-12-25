@@ -5412,7 +5412,7 @@ void loop() {
               data_len=msg[bus->getLen_idx()]-7;      // for yet unknow telegram types 0x12 to 0x15
             }
             info[0] = '\0';
-            tryDecode(msg, data_len, &info);
+            tryDecode(msg, data_len, info);
             printToWebClient(info);
             printToWebClient(PSTR("<br>"));
             printToWebClient(PSTR("<br>"));
