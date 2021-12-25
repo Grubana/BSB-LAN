@@ -68,8 +68,10 @@
  *        - ATTENTION: Change of EEPROM layout will lead to loading of default values from BSB_LAN_config.h! You need to write settings to EEPROM in configuration menu again!
  *        - ATTENTION: Folder locations and filenames have been adjusted for easier installation! If you update your installation, please take note that the configuration is now in BSB_LAN_config.h (LAN in caps), and no longer in BSB_lan_config.h (lower-caps "lan")
  *        - ATTENTION: HTTP-Authentication configuration has changed and now uses plain text instead of Base64 encoded strings!
- *        - Thanks to GitHub user do13, this code now also compiles on a ESP32, tested on NodeMCU-ESP32, Olimex ESP32-POE and Olimex ESP32-EVB boards. Most features are working right now.
- *        - Webinterface allows for configuration of most settings without the need to re-flash
+ *        - Thanks to GitHub user do13, this code now also compiles on a ESP32, tested on NodeMCU-ESP32, Olimex ESP32-POE and Olimex ESP32-EVB boards. ESP32 code uses SDK version 2.0.2, please take note when configuring Arduino IDE!
+ *        - OTA Updates now possible for ESP32-based devices
+ *        - Support for special PPS devices (based on DC225/Honeywell MCBA) added
+ *        - Webinterface allows for configuration of most settings without the need to re-flash, also split into basic and extended configuration
  *        - Added better WiFi option for Arduinos through Jiri Bilek's WiFiSpi library, using an ESP8266-based microcontroller like Wemos D1 mini or LoLin NodeMCU. Older WiFi-via-Serial approach no longer supported.
  *        - Added MDNS_SUPPORT definement in config so that BSB-LAN can be discovered through mDNS
  *        - If BSB-LAN cannot connect to WiFi on ESP32, it will set up its own access point "BSB-LAN" with password "BSB-LPB-PPS-LAN" for 30 minutes. After that, it will reboot and try to connect again.
@@ -82,6 +84,7 @@
  *        - PPS users can now send time and day of week to heater
  *        - Lots of new parameters added
  *        - URL command /JR allows for querying the standard (reset) value of a parameter in JSON format
+ *        - URL command /JB allows for backing up parameters to JSON file 
  *        - New library for DHT22 should provide more reliable results
  *        - Consolidated data and value types: New data types VT_YEAR, VT_DAYMONTH, VT_TIME as subsets of VT_DATETIME for parameters 1-3, replacing VT_SUMMERPERIOD and adjusting VT_VACATIONPROG. New value types DT_THMS for time consisting of hour:minutes:seconds
  *        - MQTT: Use MQTTDeviceID as a client ID for the broker, still defaults to BSB-LAN. ATTENTION: Check your config if you're broker relies on the client ID in any way for authorization etc.
@@ -507,7 +510,7 @@ UserDefinedEEP<> EEPROM; // default Adresse 0x50 (80)
 WebServer update_server(8080);
 #endif
 
-EEPROMClass EEPROM_ESP("nvs", EEPROM_SIZE);
+EEPROMClass EEPROM_ESP((const char *)PSTR("nvs"));
 #define EEPROM EEPROM_ESP     // This is a dirty hack because the Arduino IDE does not pass on #define NO_GLOBAL_EEPROM which would prevent the double declaration of the EEPROM object
 
 #define strcpy_PF strcpy
@@ -696,18 +699,27 @@ SdFat SD;
 // this patch (https://github.com/PaulStoffregen/OneWire/pull/93) should be applied for ESP32 support when OneWire library would be updated.
   #include "src/OneWire/OneWire.h"
   #include "src/DallasTemperature/DallasTemperature.h"
-  #define TEMPERATURE_PRECISION 9 //9 bit. Time to calculation: 94 ms
-//  #define TEMPERATURE_PRECISION 10 //10 bit. Time to calculation: 188 ms
+  #ifndef TEMPERATURE_PRECISION
+    #define TEMPERATURE_PRECISION 9 //9 bit. Time to calculation: 94 ms
+//    #define TEMPERATURE_PRECISION 10 //10 bit. Time to calculation: 188 ms
+  #endif
 OneWire *oneWire;
 DallasTemperature *sensors;
 uint8_t numSensors;
 unsigned long lastOneWireRequestTime = 0;
-  #define ONE_WIRE_REQUESTS_PERIOD 25000 //sensors->requestTemperatures() calling period
+  #ifndef ONE_WIRE_REQUESTS_PERIOD
+    #define ONE_WIRE_REQUESTS_PERIOD 25000 //sensors->requestTemperatures() calling period
+  #endif
 #endif
 
 #ifdef DHT_BUS
-  #include "src/DHT/DHT.h"
+  #if defined(__AVR__)
+    #include "src/DHT/DHT.h"
 DHT dht;
+  #else
+    #include "src/DHTesp/DHTesp.h"
+DHTesp dht;
+  #endif
 //Save state between queries
 unsigned long DHT_Timer = 0;
 int last_DHT_State = 0;
@@ -775,7 +787,7 @@ uint8_t data_type; //data type DT_*, optbl[?].data_type
 uint8_t precision;//optbl[?].precision
 uint8_t enable_byte;//optbl[?].enable_byte
 uint8_t payload_length;//optbl[?].payload_length
-uint8_t sensorid; //id of external (OneWire, DHT, MAX!) sensor for virtual programs. Must be zero for real program numbers.
+uint8_t sensorid; //id of external (OneWire, DHT, BME, MAX!) sensor for virtual programs. Must be zero for real program numbers.
 // uint8_t unit_len;//optbl[?].unit_len. internal variable
 float operand; //optbl[?].operand
 char value[64]; //decoded value from telegram to string
@@ -783,8 +795,8 @@ char unit[32]; //unit of measurement. former char div_unit[32];
 char *telegramDump; //Telegram dump for debugging in case of error. Dynamic allocation is big evil for MCU but allow to save RAM
 } decodedTelegram;
 
-uint8_t my_dev_fam = 0;
-uint8_t my_dev_var = 0;
+uint8_t my_dev_fam = DEV_FAM(DEV_NONE);
+uint8_t my_dev_var = DEV_VAR(DEV_NONE);
 
 // variables for handling of broadcast messages
 int brenner_stufe = 0;
@@ -1306,7 +1318,7 @@ int findLine(uint16_t line
     uint8_t dev_flags = get_cmdtbl_flags(i);
 //    printFmtToDebug(PSTR("l = %d, dev_fam = %d,  dev_var = %d, dev_flags = %d\r\n"), l, dev_fam, dev_var, dev_flags);
 
-    if ((dev_fam == my_dev_fam || dev_fam == 255) && (dev_var == my_dev_var || dev_var == 255)) {
+    if ((dev_fam == my_dev_fam || dev_fam == DEV_FAM(DEV_ALL)) && (dev_var == my_dev_var || dev_var == DEV_VAR(DEV_ALL))) {
       if (dev_fam == my_dev_fam && dev_var == my_dev_var) {
         if ((dev_flags & FL_NO_CMD) == FL_NO_CMD) {
           while (c==get_cmdtbl_cmd(i)) {
@@ -2352,16 +2364,26 @@ uint8_t takeNewConfigValueFromUI_andWriteToRAM(int option_id, char *buf) {
       break;}
     case CDT_MAC:{
       unsigned int i0, i1, i2, i3, i4, i5;
-      strcpy_P(sscanf_buf, PSTR("%x:%x:%x:%x:%x:%x"));
-      sscanf(buf, sscanf_buf, &i0, &i1, &i2, &i3, &i4, &i5);
-      byte variable[6];
-      variable[0] = (byte)(i0 & 0xFF);
-      variable[1] = (byte)(i1 & 0xFF);
-      variable[2] = (byte)(i2 & 0xFF);
-      variable[3] = (byte)(i3 & 0xFF);
-      variable[4] = (byte)(i4 & 0xFF);
-      variable[5] = (byte)(i5 & 0xFF);
-      writeToConfigVariable(option_id, variable);
+      uint16_t j = 0;
+      char *ptr = buf;
+      byte *variable = getConfigVariableAddress(option_id);
+      memset(variable, 0, cfg.size);
+      do{
+        char *ptr_t = ptr;
+        ptr = strchr(ptr, ',');
+        if (ptr) ptr[0] = 0;
+        strcpy_P(sscanf_buf, PSTR("%x:%x:%x:%x:%x:%x"));
+        if(sscanf(ptr_t, sscanf_buf, &i0, &i1, &i2, &i3, &i4, &i5) == 6) {
+          ((byte *)variable)[j * sizeof(mac) + 0] = (byte)(i0 & 0xFF);
+          ((byte *)variable)[j * sizeof(mac) + 1] = (byte)(i1 & 0xFF);
+          ((byte *)variable)[j * sizeof(mac) + 2] = (byte)(i2 & 0xFF);
+          ((byte *)variable)[j * sizeof(mac) + 3] = (byte)(i3 & 0xFF);
+          ((byte *)variable)[j * sizeof(mac) + 4] = (byte)(i4 & 0xFF);
+          ((byte *)variable)[j * sizeof(mac) + 5] = (byte)(i5 & 0xFF);
+        }
+        if (ptr) {ptr[0] = ','; ptr++;}
+        j++;
+      }while (ptr && j < cfg.size/sizeof(mac));
       break;
     }
     case CDT_IPV4:{
@@ -2618,6 +2640,59 @@ void printConfigWebPossibleValues(int i, uint16_t temp_value, boolean printCurre
   }
 }
 
+void printMAClistToWebClient(byte *variable, uint16_t size) {
+  bool isFirst = true;
+  for (uint16_t j = 0; j < size/sizeof(mac); j++) {
+    bool mac_valid = false;
+    for(int m = 0; m < sizeof(mac); m++){
+      if(variable[j * sizeof(mac) + m]){
+        mac_valid = true;
+        break;
+      }
+    }
+    if (mac_valid) {
+      if (!isFirst) printToWebClient(PSTR(","));
+      isFirst = false;
+      bin2hex(outBuf, variable + j * sizeof(mac), sizeof(mac), ':');
+      printToWebClient(outBuf);
+      outBuf[0] = 0;
+    }
+  }
+}
+
+void printDHTlistToWebClient(byte *variable, uint16_t size) {
+  bool isFirst = true;
+  for (uint16_t j = 0; j < size/sizeof(byte); j++) {
+    if (variable[j]) {
+      if (!isFirst) printToWebClient(PSTR(","));
+      isFirst = false;
+      printFmtToWebClient(PSTR("%d"), variable[j]);
+    }
+  }
+}
+
+void printProglistToWebClient(int *variable, uint16_t size) {
+  bool isFirst = true;
+  for (uint16_t j = 0; j < size/sizeof(int); j++) {
+    if (variable[j]) {
+      if (!isFirst) printToWebClient(PSTR(","));
+      isFirst = false;
+      printFmtToWebClient(PSTR("%d"), variable[j]);
+    }
+  }
+}
+
+void printMAXlistToWebClient(byte *variable, uint16_t size) {
+  bool isFirst = true;
+  for (uint16_t j = 0; j < size/sizeof(byte); j += sizeof(max_device_list[0])) {
+    if (variable[j]) {
+      if (!isFirst) printToWebClient(PSTR(","));
+      isFirst = false;
+      printFmtToWebClient(PSTR("%s"), variable + j);
+    }
+  }
+}
+
 void generateWebConfigPage(boolean printOnly) {
   printlnToWebClient(PSTR(MENU_TEXT_CFG "<BR>"));
   if(!printOnly){
@@ -2663,7 +2738,7 @@ void generateWebConfigPage(boolean printOnly) {
        printFmtToWebClient(PSTR("<input type=text id='option_%d' name='option_%d' "), cfg.id + 1, cfg.id + 1);
        switch (cfg.var_type) {
          case CDT_MAC:
-           printToWebClient(PSTR("pattern='^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$'"));
+           printToWebClient(PSTR("pattern='((^|,)([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))*$'"));
            break;
          case CDT_IPV4:
            printToWebClient(PSTR("pattern='((^|\\.)((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d))){4}'"));
@@ -2736,44 +2811,20 @@ void generateWebConfigPage(boolean printOnly) {
        printFmtToWebClient(PSTR("%s"), (char *)variable);
        break;
      case CDT_MAC:
-       bin2hex(outBuf, variable, 6, ':');
-       printToWebClient(outBuf);
-       outBuf[0] = 0;
-  //       printFmtToWebClient(PSTR("%02X:%02X:%02X:%02X:%02X:%02X"), (int)variable[0], (int)variable[1], (int)variable[2], (int)variable[3], (int)variable[4], (int)variable[5]);
+       printMAClistToWebClient((byte *)variable, cfg.size);
        break;
      case CDT_IPV4:
        printFmtToWebClient(PSTR("%u.%u.%u.%u"), (int)variable[0], (int)variable[1], (int)variable[2], (int)variable[3]);
        break;
-     case CDT_PROGNRLIST:{
-       bool isFirst = true;
-       for (uint16_t j = 0; j < cfg.size/sizeof(int); j++) {
-         if (((int *)variable)[j]) {
-           if (!isFirst) printToWebClient(PSTR(","));
-           isFirst = false;
-           printFmtToWebClient(PSTR("%d"), ((int *)variable)[j]);
-         }
-       }
-       break;}
-     case CDT_DHTBUS:{
-       bool isFirst = true;
-       for (uint16_t j = 0; j < cfg.size/sizeof(byte); j++) {
-         if (variable[j]) {
-           if (!isFirst) printToWebClient(PSTR(","));
-           isFirst = false;
-           printFmtToWebClient(PSTR("%d"), variable[j]);
-         }
-       }
-       break;}
-     case CDT_MAXDEVICELIST:{
-       bool isFirst = true;
-       for (uint16_t j = 0; j < cfg.size/sizeof(byte); j += sizeof(max_device_list[0])) {
-         if (variable[j]) {
-           if (!isFirst) printToWebClient(PSTR(","));
-           isFirst = false;
-           printFmtToWebClient(PSTR("%s"), variable + j);
-         }
-       }
-       break;}
+     case CDT_PROGNRLIST:
+       printProglistToWebClient((int *)variable, cfg.size);
+       break;
+     case CDT_DHTBUS:
+       printDHTlistToWebClient((byte *)variable, cfg.size);
+       break;
+     case CDT_MAXDEVICELIST:
+       printMAXlistToWebClient((byte *)variable, cfg.size);
+       break;
      default: break;
    }
 
@@ -2855,13 +2906,13 @@ void generateJSONwithConfig() {
                i=findLine(65533,0,NULL); //return ENUM_ONOFF
                break;
            }
-           printFmtToWebClient(PSTR("%d\",\r\n"), (uint16_t)variable[0]);
+           printFmtToWebClient(PSTR("%u\",\r\n"), (uint16_t)variable[0]);
            printConfigJSONPossibleValues(i);
            break;}
          case CPI_DROPDOWN:{
            int i = returnENUMID4ConfigOption(cfg.id);
            if (i > 0) {
-             printFmtToWebClient(PSTR("%d\",\r\n"), (uint16_t)variable[0]);
+             printFmtToWebClient(PSTR("%u\",\r\n"), (uint16_t)variable[0]);
              printConfigJSONPossibleValues(i);
            }
            break;}
@@ -2881,7 +2932,7 @@ void generateJSONwithConfig() {
                break;
            }
            if (i > 0) {
-             printFmtToWebClient(PSTR("%d\",\r\n"), ((uint16_t *)variable)[0]);
+             printFmtToWebClient(PSTR("%u\",\r\n"), ((uint16_t *)variable)[0]);
              printConfigJSONPossibleValues(i);
            }
            break;}
@@ -2894,48 +2945,25 @@ void generateJSONwithConfig() {
        printFmtToWebClient(PSTR("%s\""), (char *)variable);
        break;
      case CDT_MAC:
-       bin2hex(outBuf, variable, 6, ':');
-       printToWebClient(outBuf);
-       outBuf[0] = 0;
+       printMAClistToWebClient((byte *)variable, cfg.size);
        printToWebClient(PSTR("\""));
   //       printFmtToWebClient(PSTR("%02X:%02X:%02X:%02X:%02X:%02X"), (int)variable[0], (int)variable[1], (int)variable[2], (int)variable[3], (int)variable[4], (int)variable[5]);
        break;
      case CDT_IPV4:
        printFmtToWebClient(PSTR("%u.%u.%u.%u\""), (int)variable[0], (int)variable[1], (int)variable[2], (int)variable[3]);
        break;
-     case CDT_PROGNRLIST:{
-       bool isFirst = true;
-       for (uint16_t j = 0; j < cfg.size/sizeof(int); j++) {
-         if (((int *)variable)[j]) {
-           if (!isFirst) printToWebClient(PSTR(","));
-           isFirst = false;
-           printFmtToWebClient(PSTR("%d"), ((int *)variable)[j]);
-         }
-       }
+     case CDT_PROGNRLIST:
+       printProglistToWebClient((int *)variable, cfg.size);
        printToWebClient(PSTR("\""));
-       break;}
-     case CDT_DHTBUS:{
-       bool isFirst = true;
-       for (uint16_t j = 0; j < cfg.size/sizeof(byte); j++) {
-         if (variable[j]) {
-           if (!isFirst) printToWebClient(PSTR(","));
-           isFirst = false;
-           printFmtToWebClient(PSTR("%d"), variable[j]);
-         }
-       }
+       break;
+     case CDT_DHTBUS:
+       printDHTlistToWebClient((byte *)variable, cfg.size);
        printToWebClient(PSTR("\""));
-       break;}
-     case CDT_MAXDEVICELIST:{
-       bool isFirst = true;
-       for (uint16_t j = 0; j < cfg.size/sizeof(byte); j += sizeof(max_device_list[0])) {
-         if (variable[j]) {
-           if (!isFirst) printToWebClient(PSTR(","));
-           isFirst = false;
-           printFmtToWebClient(PSTR("%s"), variable + j);
-         }
-       }
+       break;
+     case CDT_MAXDEVICELIST:
+       printMAXlistToWebClient((byte *)variable, cfg.size);
        printToWebClient(PSTR("\""));
-       break;}
+       break;
      default: break;
    }
   }
@@ -3015,7 +3043,7 @@ void LogTelegram(byte* msg) {
     if ((bus->getBusType() != BUS_PPS && c == cmd) || (bus->getBusType() == BUS_PPS && line >= 15000 && (cmd == ((c & 0x00FF0000) >> 16)))) {   // one-byte command code of PPS is stored in bitmask 0x00FF0000 of command ID
       uint8_t dev_fam = get_cmdtbl_dev_fam(i);
       uint8_t dev_var = get_cmdtbl_dev_var(i);
-      if ((dev_fam == my_dev_fam || dev_fam == 255) && (dev_var == my_dev_var || dev_var == 255)) {
+      if ((dev_fam == my_dev_fam || dev_fam == DEV_FAM(DEV_ALL)) && (dev_var == my_dev_var || dev_var == DEV_VAR(DEV_ALL))) {
         if (dev_fam == my_dev_fam && dev_var == my_dev_var) {
           break;
         } else if ((!known && dev_fam!=my_dev_fam) || (dev_fam==my_dev_fam)) { // wider match has hit -> store in case of best match
@@ -3314,11 +3342,24 @@ int set(int line      // the ProgNr of the heater parameter
     case VT_ENERGY:
     case VT_MINUTES:
       {
-      uint32_t t = 0;
+      char* val1 = (char *)val;
       if (val[0] == '-') {
-        t=((int)(atof(val)*decodedTelegram.operand));
-      } else {
-        t=atof(val)*decodedTelegram.operand;
+        val1++;
+      }
+      uint32_t t = atoi(val1) * decodedTelegram.operand;
+      val1 = strchr(val, '.');
+      if(val1) {
+        val1++;
+        int len = strlen(val1);
+        uint32_t tpart = atoi(val1) * decodedTelegram.operand;
+        for(int d = 0; d < len; d++) {
+          if(tpart % 10 > 4 && d + 1 == len) tpart += 10; //rounding
+          tpart /= 10;
+        }
+        t += tpart;
+      }
+      if (val[0] == '-') {
+        t = -1 * (int) t;
       }
       for (int x=decodedTelegram.payload_length;x>0;x--) {
         param[decodedTelegram.payload_length-x+1] = (t >> ((x-1)*8)) & 0xff;
@@ -3940,16 +3981,30 @@ void queryVirtualPrognr(int line, int table_line) {
       if (last_DHT_pin != DHT_Pins[log_sensor]) {
         last_DHT_pin = DHT_Pins[log_sensor];
         DHT_Timer = millis();
+#if defined(__AVR__)
         dht.setup(last_DHT_pin);
+#elif defined(ESP32)
+        dht.setup(last_DHT_pin, DHTesp::DHT22);
+#else
+        dht.setup(last_DHT_pin, DHTesp::AUTO_DETECT);
+#endif
       }
 
       printFmtToDebug(PSTR("DHT22 sensor: %d - "), last_DHT_pin);
       switch (dht.getStatus()) {
+#if defined(__AVR__)
         case DHT::ERROR_CHECKSUM:
+#else
+        case DHTesp::ERROR_CHECKSUM:
+#endif
           decodedTelegram.error = 256;
           printlnToDebug(PSTR("Checksum error"));
           break;
-        case DHT::ERROR_TIMEOUT:
+  #if defined(__AVR__)
+          case DHT::ERROR_TIMEOUT:
+  #else
+          case DHTesp::ERROR_TIMEOUT:
+  #endif
           decodedTelegram.error = 261;
           printlnToDebug(PSTR("Time out error"));
          break;
@@ -5305,7 +5360,7 @@ void loop() {
 #if defined(ESP32)
               esp_task_wdt_reset();
 #endif
-              if (((dev_fam != temp_dev_fam && dev_fam != 255) || (dev_var != temp_dev_var && dev_var != 255)) && c!=CMD_UNKNOWN) {
+              if (((dev_fam != temp_dev_fam && dev_fam != DEV_FAM(DEV_ALL)) || (dev_var != temp_dev_var && dev_var != DEV_VAR(DEV_ALL))) && c!=CMD_UNKNOWN) {
                 printFmtToDebug(PSTR("%02X\r\n"), c);
                 if (!bus->Send(TYPE_QUR, c, msg, tx_msg)) {
                   print_bus_send_failed();
@@ -5357,32 +5412,36 @@ void loop() {
           printToWebClient(PSTR("\r\nComplete dump:\r\n"));
           c = 0;
           bus->Send(TYPE_IQ1, c, msg, tx_msg);
-          int IA1_max = (msg[7+bus->getBusType()*4] << 8) + msg[8+bus->getBusType()*4];
-          bus->Send(TYPE_IQ2, c, msg, tx_msg);
-          int IA2_max = (msg[5+bus->getBusType()*4] << 8) + msg[6+bus->getBusType()*4];
-          int outBufLen = strlen(outBuf);
-
-          for (int IA1_counter = 1; IA1_counter <= IA1_max; IA1_counter++) {
+          if (msg[4+bus->getBusType()*4] == 0x13) {
+            int IA1_max = (msg[7+bus->getBusType()*4] << 8) + msg[8+bus->getBusType()*4];
+            bus->Send(TYPE_IQ2, c, msg, tx_msg);
+            int IA2_max = (msg[5+bus->getBusType()*4] << 8) + msg[6+bus->getBusType()*4];
+            int outBufLen = strlen(outBuf);
+  
+            for (int IA1_counter = 1; IA1_counter <= IA1_max; IA1_counter++) {
 #if defined(ESP32)
-            esp_task_wdt_reset();
+              esp_task_wdt_reset();
 #endif
-            bus->Send(TYPE_IQ1, IA1_counter, msg, tx_msg);
-            bin2hex(outBuf + outBufLen, msg, msg[bus->getLen_idx()]+bus->getBusType(), ' ');
-            printToWebClient(outBuf + outBufLen);
-            printToWebClient(PSTR("\r\n"));
-            flushToWebClient();
-          }
-          for (int IA2_counter = 1; IA2_counter <= IA2_max; IA2_counter++) {
+              bus->Send(TYPE_IQ1, IA1_counter, msg, tx_msg);
+              bin2hex(outBuf + outBufLen, msg, msg[bus->getLen_idx()]+bus->getBusType(), ' ');
+              printToWebClient(outBuf + outBufLen);
+              printToWebClient(PSTR("\r\n"));
+              flushToWebClient();
+            }
+            for (int IA2_counter = 1; IA2_counter <= IA2_max; IA2_counter++) {
 #if defined(ESP32)
-            esp_task_wdt_reset();
+              esp_task_wdt_reset();
 #endif
-            bus->Send(TYPE_IQ2, IA2_counter, msg, tx_msg);
-            bin2hex(outBuf + outBufLen, msg, msg[bus->getLen_idx()]+bus->getBusType(), ' ');
-            printToWebClient(outBuf + outBufLen);
-            printToWebClient(PSTR("\r\n"));
-            flushToWebClient();
+              bus->Send(TYPE_IQ2, IA2_counter, msg, tx_msg);
+              bin2hex(outBuf + outBufLen, msg, msg[bus->getLen_idx()]+bus->getBusType(), ' ');
+              printToWebClient(outBuf + outBufLen);
+              printToWebClient(PSTR("\r\n"));
+              flushToWebClient();
+            }
+            outBuf[outBufLen] = 0;
+          } else {
+            printToWebClient(PSTR("\r\nNot supported by this device. No problem.\r\n"));
           }
-          outBuf[outBufLen] = 0;
           printToWebClient(PSTR("\r\n" MENU_TEXT_QFE ".\r\n"));
 //          if (!(httpflags & HTTP_FRAG)) webPrintFooter();
           forcedflushToWebClient();
@@ -5462,7 +5521,7 @@ void loop() {
             int16_t http_code = HTTP_OK;
             long cache_time = HTTP_DO_NOT_CACHE;
 
-            if ((p[2] == 'C' || p[2] == 'K') && json_token!=NULL) {
+            if (json_token!=NULL && (p[2] == 'C' || (p[2] == 'K' && atoi(json_token) != CAT_USERSENSORS))) {
               cache_time = 300; //5 min
               if ((httpflags & HTTP_ETAG))
                 http_code = HTTP_NOT_MODIFIED;
@@ -6854,6 +6913,7 @@ void setup() {
   SerialOutput->println(F("READY"));
 
 #if defined(ESP32)
+  setCpuFrequencyMhz(80);     // reduce speed from 240 MHz to 80 MHz to reduce power consumption by approx. 20% with no significant loss of speed
   #ifndef WDT_TIMEOUT
   //set watchdog timeout 120 seconds
     #define WDT_TIMEOUT 120
@@ -7101,7 +7161,8 @@ void setup() {
 
 #ifdef BME280
     if(BME_Sensors) {
-      printToDebug(PSTR("Init BMxx80 sensor(s)...\r\n"));
+      printToDebug(PSTR("Init BMx280 sensor(s)...\r\n"));
+      if(BME_Sensors > 16) BME_Sensors = 16;
       bme = new BlueDot_BME280[BME_Sensors];
       for (uint8_t f = 0; f < BME_Sensors; f++) {
         bme[f].parameter.communication = 0;                     //I2C communication for Sensor
@@ -7288,7 +7349,7 @@ void setup() {
   #endif
   }
 
-  unsigned long timeout = millis();
+  unsigned long timeout;
   #ifdef ESP32
   WiFi.disconnect(true);  //disconnect form wifi to set new wifi connection
   WiFi.mode(WIFI_STA); //init wifi mode
@@ -7524,11 +7585,11 @@ void setup() {
     SetDevId();
   } else {
     if (pps_values[PPS_QTP] == 0xEA) {
-      my_dev_fam = 0;
-      my_dev_var = 2;
+      my_dev_fam = DEV_FAM(DEV_PPS_MCBA);
+      my_dev_var = DEV_VAR(DEV_PPS_MCBA);
     } else {
-      my_dev_fam = 0;
-      my_dev_var = 1;
+      my_dev_fam = DEV_FAM(DEV_PPS);
+      my_dev_var = DEV_VAR(DEV_PPS);
     }
   }
 
