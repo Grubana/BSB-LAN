@@ -13737,3 +13737,109 @@ PROGMEM_LATE const cmd_t cmdtbl3[]={
 {0xDEADBEEF,  CAT_UNKNOWN,          VT_ENUM,          65534, STR65535, sizeof(ENUM_EEPROM_ONOFF), ENUM_EEPROM_ONOFF,  DEFAULT_FLAG, DEV_ALL}, //
 {CMD_END,     CAT_UNKNOWN,          VT_UNKNOWN,       65535, STR65535, 0,                    NULL,         DEFAULT_FLAG, DEV_ALL}
 };
+
+/* bruteforce RVA46
+b'053D0000': ['Bit: 00001010', 'Word: 10', 'SInt: 10', 'FIXPOINT: 10', 'Time: 00:10', 'String: -'] | 6223 Konfiguration - Bisher unbekannte Geräteabfrage: -
+b'053D0001': ['String: RVA46.531/109'] | 6224 Konfiguration - Geräte-Identifikation: RVA46.531/109
+b'053D0002': ['Bit: 00010111', 'Word: 23', 'SInt: 23', 'FIXPOINT: 23', 'Time: 00:23', 'String: -'] | 6225 Konfiguration - Gerätefamilie: -
+b'053D0003': ['Bit: 01101101', 'Word: 109', 'SInt: 109', 'FIXPOINT: 109', 'Time: 00:109', 'String: -'] | 6226 Konfiguration - Gerätevariante: -
+b'053D0004': ['Bit: 11010111', 'Word: 200', 'SInt: 20070', 'FIXPOINT: 200.7', 'Time: 07:215', 'String: -'] | 6227 Konfiguration - Objektverzeichnis-Version: -
+b'053D0006': ['Bit: 11111111', 'Byte: 255', 'FIXPOINT_BYTE: -1', 'FIXPOINT_BYTE_US: 255', 'CHOICE: 255', 'LPBAddr: 15.16', 'String: -'] | 6610 LPB-System - Anzeige Systemmeldungen: - - Ja
+b'053D0007': ['Byte: 0', 'FIXPOINT_BYTE: 0.0', 'FIXPOINT_BYTE_US: 0.0', 'CHOICE: 0', 'LPBAddr: 00.01', 'String: -'] | 10201 Benutzerdefiniert - Unknown command: -
+b'053D000b': ['DateTime: 28.11.2021 21:07:40', 'String: -'] |    0 Uhrzeit und Datum - Datum/Zeit: -
+b'053D000c': ['Bit: 00000011', 'Byte: 3', 'FIXPOINT_BYTE: 3', 'FIXPOINT_BYTE_US: 3', 'CHOICE: 3', 'LPBAddr: 00.04', 'String: -'] | 6600 LPB-System - Geräteadresse: -
+b'053D000e': ['Bit: 00100011', 'Word: 3', 'SInt: 350', 'FIXPOINT: 3.5', 'Time: 00:35', 'String: -'] |   70 Bedieneinheit - Geräte-Version Bedienteil: -
+b'053D0010': ['DWord: 1', 'FIXPOINT: 1.0', 'String: -'] | 10202 Benutzerdefiniert - Unknown command: -
+b'053D0064': ['String: -'] |   -1  - : -
+b'053D0066': ['String: 9-!'] | 10204 Benutzerdefiniert - Unknown command: 9-!
+b'053D0067': ['Byte: 11', 'FIXPOINT_BYTE: 11.0', 'FIXPOINT_BYTE_US: 11.0', 'CHOICE: 11', 'LPBAddr: 00.12', 'String: -'] |   -1  - : -
+b'053D0068': ['String: ABILD21'] | 10205 Benutzerdefiniert - Unknown command: ABILD21
+b'053D0069': ['Byte: ---', 'FIXPOINT_BYTE: ---', 'FIXPOINT_BYTE_US: ---', 'CHOICE: ---', 'LPBAddr: ---', 'String: \x10'] | 10206 Benutzerdefiniert - Unknown command: 
+b'053D006b': ['Byte: 0', 'FIXPOINT_BYTE: 0.0', 'FIXPOINT_BYTE_US: 0.0', 'CHOICE: 0', 'LPBAddr: 00.01', 'String: -'] | 6701 Fehler - Unknown command: -
+b'053D006d': ['Bit: 00000010', 'Byte: 2', 'FIXPOINT_BYTE: 2', 'FIXPOINT_BYTE_US: 2', 'CHOICE: 2', 'LPBAddr: 00.03', 'String: -'] | 6640 LPB-System - Uhrbetrieb: - - Slave ohne Fernverstellung
+b'053D0071': ['Bit: 00000001', 'Byte: 1', 'FIXPOINT_BYTE: 1', 'FIXPOINT_BYTE_US: 1', 'CHOICE: 1', 'LPBAddr: 00.02', 'String: -'] | 6604 LPB-System - Busspeisung Funktion: - - Automatisch
+b'053D0072': ['Bit: 11111111', 'Byte: 255', 'FIXPOINT_BYTE: -1', 'FIXPOINT_BYTE_US: 255', 'CHOICE: 255', 'LPBAddr: 15.16', 'String: -'] | 6605 LPB-System - Busspeisung Status: - - Ein
+b'053D0073': ['Bit: 00000000', 'Byte: 0', 'FIXPOINT_BYTE: 0', 'FIXPOINT_BYTE_US: 0', 'CHOICE: 0', 'LPBAddr: 00.01', 'String: -'] | 7700 Ein-/Ausgangstest - Relaistest: - - Kein Test
+b'053D0074': ['Bit: 00000100', 'Byte: 4', 'FIXPOINT_BYTE: 4', 'FIXPOINT_BYTE_US: 4', 'CHOICE: 4', 'LPBAddr: 00.05', 'String: -'] |  700 Heizkreis 1 - Betriebsart: - - Automatik
+b'053D0075': ['Bit: 00000000', 'Byte: 0', 'FIXPOINT_BYTE: 0', 'FIXPOINT_BYTE_US: 0', 'CHOICE: 0', 'LPBAddr: 00.01', 'String: -'] | 7140 Wartung/Sonderbetrieb - Handbetrieb: - - Aus
+b'053D0078': ['Byte: ---', 'FIXPOINT_BYTE: ---', 'FIXPOINT_BYTE_US: ---', 'CHOICE: ---', 'LPBAddr: ---', 'String: \x01'] |   71 Bedieneinheit - Raumgerät-Typ: 
+b'053D0082': ['Bit: 00000001', 'Byte: 1', 'FIXPOINT_BYTE: 1', 'FIXPOINT_BYTE_US: 1', 'CHOICE: 1', 'LPBAddr: 00.02', 'String: -'] | 6650 LPB-System - Außentemperatur Lieferant: -
+b'053D044d': ['Word: 62664', 'SInt: -2872', 'FIXPOINT: -2872.0', 'Time: 244:200', 'String: -'] |   -1  - : -
+b'053D044e': ['Word: 64892', 'SInt: -644', 'FIXPOINT: -644.0', 'Time: 253:124', 'String: -'] |   -1  - : -
+b'053D044f': ['Byte: 7', 'FIXPOINT_BYTE: 7.0', 'FIXPOINT_BYTE_US: 7.0', 'CHOICE: 7', 'LPBAddr: 00.08', 'String: -'] |   -1  - : -
+b'053D0458': ['Word: 992', 'SInt: 992', 'FIXPOINT: 992.0', 'Time: 03:224', 'String: -'] |   -1  - : -
+b'053D0462': ['Bit: 00000000', 'Word: ---', 'SInt: ---', 'FIXPOINT: ---', 'Time: --:--', 'String: \x01'] | 7750 Ein-/Ausgangstest - Trinkwassertemperatur B3:  °C
+b'053D0464': ['Bit: 10101110', 'Word: 14', 'SInt: -5248', 'FIXPOINT: 14.7', 'Time: 03:174', 'String: -'] | 8743 Diagnose Verbraucher - Vorlauftemperatur 1: - °C
+b'053D0468': ['Bit: 00000000', 'Word: ---', 'SInt: ---', 'FIXPOINT: ---', 'Time: --:--', 'String: \x01'] | 7760 Ein-/Ausgangstest - Kesseltemperatur B2:  °C
+Failed to fetch b'053D0470': 'utf-8' codec can't decode byte 0x80 in position 100: invalid start byte
+b'053D0488': ['String: -'] |   -1  - : -
+b'053D04b7': ['Byte: 1', 'FIXPOINT_BYTE: 1.0', 'FIXPOINT_BYTE_US: 1.0', 'CHOICE: 1', 'LPBAddr: 00.02', 'String: -'] |   -1  - : -
+b'053D04b8': ['Byte: 0', 'FIXPOINT_BYTE: 0.0', 'FIXPOINT_BYTE_US: 0.0', 'CHOICE: 0', 'LPBAddr: 00.01', 'String: -'] | 9406 Diagnose Verbraucher - Unknown command: -
+b'053D04be': ['Byte: 0', 'FIXPOINT_BYTE: 0.0', 'FIXPOINT_BYTE_US: 0.0', 'CHOICE: 0', 'LPBAddr: 00.01', 'String: -'] |   -1  - : -
+b'053D04bf': ['Byte: 0', 'FIXPOINT_BYTE: 0.0', 'FIXPOINT_BYTE_US: 0.0', 'CHOICE: 0', 'LPBAddr: 00.01', 'String: -'] |   -1  - : -
+b'053D051e': ['Bit: 00000000', 'Word: ---', 'SInt: ---', 'FIXPOINT: ---', 'Time: --:--', 'String: \x01'] | 8740 Diagnose Verbraucher - Raumtemperatur 1:  °C
+b'053D051f': ['Bit: 01100111', 'Word: 37', 'SInt: 22976', 'FIXPOINT: 37.6', 'Time: 09:103', 'String: -'] | 8950 Diagnose Verbraucher - Schienenvorlauftemperatur: - °C
+b'053D0521': ['Bit: 01100011', 'Word: 5', 'SInt: 22720', 'FIXPOINT: 5.5', 'Time: 01:99', 'String: -'] | 8700 Diagnose Verbraucher - Außentemperatur: - °C
+b'053D0590': ['Word: 1024', 'SInt: 1024', 'FIXPOINT: 1024.0', 'Time: 04:00', 'String: -'] |   -1  - : -
+b'053D0592': ['Word: 320', 'SInt: 320', 'FIXPOINT: 320.0', 'Time: 01:64', 'String: -'] |   -1  - : -
+b'053D0593': ['Word: 992', 'SInt: 992', 'FIXPOINT: 992.0', 'Time: 03:224', 'String: -'] |   -1  - : -
+b'053D0596': ['Byte: 255', 'FIXPOINT_BYTE: -1.0', 'FIXPOINT_BYTE_US: 255.0', 'CHOICE: 255', 'LPBAddr: 15.16', 'String: -'] |   -1  - : -
+b'053D059c': ['Byte: ---', 'FIXPOINT_BYTE: ---', 'FIXPOINT_BYTE_US: ---', 'CHOICE: ---', 'LPBAddr: ---', 'String: @\x02'] |   -1  - : @
+b'053D05f0': ['Bit: 10001100', 'Word: 2', 'SInt: 8960', 'FIXPOINT: 2.2', 'Time: 00:140', 'String: -'] | 8703 Diagnose Verbraucher - Außentemperatur gedämpft: - °C
+b'053D05f2': ['Bit: 00101101', 'Word: 4', 'SInt: 19264', 'FIXPOINT: 4.7', 'Time: 01:45', 'String: -'] | 8704 Diagnose Verbraucher - Außentemperatur gemischt: - °C
+b'053D05f3': ['Word: 0', 'SInt: 0', 'FIXPOINT: 0.0', 'Time: 00:00', 'String: -'] |   -1  - : -
+b'053D05f7': ['Byte: 30', 'FIXPOINT_BYTE: 30.0', 'FIXPOINT_BYTE_US: 30.0', 'CHOICE: 30', 'LPBAddr: 01.15', 'String: -'] |   -1  - : -
+b'053D05fb': ['Byte: 2', 'FIXPOINT_BYTE: 2.0', 'FIXPOINT_BYTE_US: 2.0', 'CHOICE: 2', 'LPBAddr: 00.03', 'String: -'] |   -1  - : -
+b'053D05fd': ['Word: 1152', 'SInt: 1152', 'FIXPOINT: 1152.0', 'Time: 04:128', 'String: -'] |   -1  - : -
+b'053D05fe': ['Bit: 00000000', 'Byte: 0', 'FIXPOINT_BYTE: 0', 'FIXPOINT_BYTE_US: 0', 'CHOICE: 0', 'LPBAddr: 00.01', 'String: -'] | 6120 Konfiguration - Anlagenfrostschutz: - - Aus
+b'053D0601': ['Byte: 255', 'FIXPOINT_BYTE: -1.0', 'FIXPOINT_BYTE_US: 255.0', 'CHOICE: 255', 'LPBAddr: 15.16', 'String: -'] |   -1  - : -
+b'053D0602': ['Word: 320', 'SInt: 320', 'FIXPOINT: 320.0', 'Time: 01:64', 'String: -'] |   -1  - : -
+b'053D0603': ['Byte: 6', 'FIXPOINT_BYTE: 6.0', 'FIXPOINT_BYTE_US: 6.0', 'CHOICE: 6', 'LPBAddr: 00.07', 'String: -'] |   -1  - : -
+b'053D060b': ['Byte: 0', 'FIXPOINT_BYTE: 0.0', 'FIXPOINT_BYTE_US: 0.0', 'CHOICE: 0', 'LPBAddr: 00.01', 'String: -'] |   -1  - : -
+b'053D060d': ['Byte: 15', 'FIXPOINT_BYTE: 15.0', 'FIXPOINT_BYTE_US: 15.0', 'CHOICE: 15', 'LPBAddr: 00.16', 'String: -'] |   -1  - : -
+b'053D060e': ['Byte: 15', 'FIXPOINT_BYTE: 15.0', 'FIXPOINT_BYTE_US: 15.0', 'CHOICE: 15', 'LPBAddr: 00.16', 'String: -'] |   -1  - : -
+b'053D060f': ['Word: 32', 'SInt: 32', 'FIXPOINT: 32.0', 'Time: 00:32', 'String: -'] |   -1  - : -
+b'053D0610': ['Word: 0', 'SInt: 0', 'FIXPOINT: 0.0', 'Time: 00:00', 'String: -'] |   -1  - : -
+b'053D0611': ['Byte: 0', 'FIXPOINT_BYTE: 0.0', 'FIXPOINT_BYTE_US: 0.0', 'CHOICE: 0', 'LPBAddr: 00.01', 'String: -'] |   -1  - : -
+b'053D064f': ['Byte: 0', 'FIXPOINT_BYTE: 0.0', 'FIXPOINT_BYTE_US: 0.0', 'CHOICE: 0', 'LPBAddr: 00.01', 'String: -'] |   -1  - : -
+b'053D065d': ['Word: 256', 'SInt: 256', 'FIXPOINT: 256.0', 'Time: 01:00', 'String: -'] |   -1  - : -
+b'053D065e': ['Byte: 100', 'FIXPOINT_BYTE: 100.0', 'FIXPOINT_BYTE_US: 100.0', 'CHOICE: 100', 'LPBAddr: 06.05', 'String: -'] |   -1  - : -
+b'053D0662': ['Word: 960', 'SInt: 960', 'FIXPOINT: 960.0', 'Time: 03:192', 'String: -'] |   -1  - : -
+b'053D0663': ['Word: 960', 'SInt: 960', 'FIXPOINT: 960.0', 'Time: 03:192', 'String: -'] |   -1  - : -
+b'053D0667': ['Word: 960', 'SInt: 960', 'FIXPOINT: 960.0', 'Time: 03:192', 'String: -'] |   -1  - : -
+b'053D06b8': ['Word: 4160', 'SInt: 4160', 'FIXPOINT: 4160.0', 'Time: 16:64', 'String: -'] |   -1  - : -
+b'053D06b9': ['Word: 3520', 'SInt: 3520', 'FIXPOINT: 3520.0', 'Time: 13:192', 'String: -'] |   -1  - : -
+b'053D06ba': ['Word: 2560', 'SInt: 2560', 'FIXPOINT: 2560.0', 'Time: 10:00', 'String: -'] |   -1  - : -
+b'053D071d': ['Word: 320', 'SInt: 320', 'FIXPOINT: 320.0', 'Time: 01:64', 'String: -'] |   -1  - : -
+b'053D071e': ['Byte: 0', 'FIXPOINT_BYTE: 0.0', 'FIXPOINT_BYTE_US: 0.0', 'CHOICE: 0', 'LPBAddr: 00.01', 'String: -'] |   -1  - : -
+b'053D071f': ['Byte: 0', 'FIXPOINT_BYTE: 0.0', 'FIXPOINT_BYTE_US: 0.0', 'CHOICE: 0', 'LPBAddr: 00.01', 'String: -'] |   -1  - : -
+b'053D0720': ['Word: 640', 'SInt: 640', 'FIXPOINT: 640.0', 'Time: 02:128', 'String: -'] |   -1  - : -
+b'053D0721': ['Byte: 1', 'FIXPOINT_BYTE: 1.0', 'FIXPOINT_BYTE_US: 1.0', 'CHOICE: 1', 'LPBAddr: 00.02', 'String: -'] |   -1  - : -
+b'053D0722': ['Byte: 3', 'FIXPOINT_BYTE: 3.0', 'FIXPOINT_BYTE_US: 3.0', 'CHOICE: 3', 'LPBAddr: 00.04', 'String: -'] |   -1  - : -
+b'053D0723': ['Byte: 255', 'FIXPOINT_BYTE: -1.0', 'FIXPOINT_BYTE_US: 255.0', 'CHOICE: 255', 'LPBAddr: 15.16', 'String: -'] |   -1  - : -
+b'053D0727': ['Bit: 00000000', 'Byte: 0', 'FIXPOINT_BYTE: 0', 'FIXPOINT_BYTE_US: 0', 'CHOICE: 0', 'LPBAddr: 00.01', 'String: -'] | 5736 Konfiguration - Trinkwasser Trennschaltung: - - Aus
+b'053D083e': ['Byte: 0', 'FIXPOINT_BYTE: 0.0', 'FIXPOINT_BYTE_US: 0.0', 'CHOICE: 0', 'LPBAddr: 00.01', 'String: -'] | 10254 Benutzerdefiniert - Unknown command: -
+b'053D083f': ['DWord: ---', 'FIXPOINT: ---', 'String: \x01'] |   -1  - : 
+b'053D0924': ['Byte: 255', 'FIXPOINT_BYTE: -1.0', 'FIXPOINT_BYTE_US: 255.0', 'CHOICE: 255', 'LPBAddr: 15.16', 'String: -'] |   -1  - : -
+b'053D0925': ['Byte: 0', 'FIXPOINT_BYTE: 0.0', 'FIXPOINT_BYTE_US: 0.0', 'CHOICE: 0', 'LPBAddr: 00.01', 'String: -'] |   -1  - : -
+b'053D0926': ['Byte: 0', 'FIXPOINT_BYTE: 0.0', 'FIXPOINT_BYTE_US: 0.0', 'CHOICE: 0', 'LPBAddr: 00.01', 'String: -'] |   -1  - : -
+b'053D0928': ['Word: 512', 'SInt: 512', 'FIXPOINT: 512.0', 'Time: 02:00', 'String: -'] |   -1  - : -
+b'053D092b': ['Word: 5120', 'SInt: 5120', 'FIXPOINT: 5120.0', 'Time: 20:00', 'String: -'] |   -1  - : -
+b'053D092c': ['Word: 2560', 'SInt: 2560', 'FIXPOINT: 2560.0', 'Time: 10:00', 'String: -'] |   -1  - : -
+b'053D092d': ['Word: 2560', 'SInt: 2560', 'FIXPOINT: 2560.0', 'Time: 10:00', 'String: -'] |   -1  - : -
+b'053D0930': ['Byte: 255', 'FIXPOINT_BYTE: -1.0', 'FIXPOINT_BYTE_US: 255.0', 'CHOICE: 255', 'LPBAddr: 15.16', 'String: -'] |   -1  - : -
+b'053D0932': ['Word: 50', 'SInt: 50', 'FIXPOINT: 50.0', 'Time: 00:50', 'String: -'] |   -1  - : -
+b'053D0933': ['Word: 10', 'SInt: 10', 'FIXPOINT: 10.0', 'Time: 00:10', 'String: -'] |   -1  - : -
+b'053D0939': ['Byte: 4', 'FIXPOINT_BYTE: 4.0', 'FIXPOINT_BYTE_US: 4.0', 'CHOICE: 4', 'LPBAddr: 00.05', 'String: -'] |   -1  - : -
+b'053D093b': ['DWord: 0', 'FIXPOINT: 0.0', 'String: -'] |   -1  - : -
+b'053D093d': ['DWord: 0', 'FIXPOINT: 0.0', 'String: -'] |   -1  - : -
+b'053D093f': ['Word: 0', 'SInt: 0', 'FIXPOINT: 0.0', 'Time: 00:00', 'String: -'] |   -1  - : -
+b'053D0942': ['Word: 100', 'SInt: 100', 'FIXPOINT: 100.0', 'Time: 00:100', 'String: -'] |   -1  - : -
+b'053D0943': ['Word: 20', 'SInt: 20', 'FIXPOINT: 20.0', 'Time: 00:20', 'String: -'] |   -1  - : -
+b'053D0bbc': ['Word: 0', 'SInt: 0', 'FIXPOINT: 0.0', 'Time: 00:00', 'String: -'] |   -1  - : -
+b'053D0bbd': ['Byte: 255', 'FIXPOINT_BYTE: -1.0', 'FIXPOINT_BYTE_US: 255.0', 'CHOICE: 255', 'LPBAddr: 15.16', 'String: -'] |   -1  - : -
+b'053D0bcc': ['Byte: 6', 'FIXPOINT_BYTE: 6.0', 'FIXPOINT_BYTE_US: 6.0', 'CHOICE: 6', 'LPBAddr: 00.07', 'String: -'] |   -1  - : -
+b'053D0bce': ['Byte: 1', 'FIXPOINT_BYTE: 1.0', 'FIXPOINT_BYTE_US: 1.0', 'CHOICE: 1', 'LPBAddr: 00.02', 'String: -'] |   -1  - : -
+
+
+*/
