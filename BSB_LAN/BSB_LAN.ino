@@ -5379,7 +5379,7 @@ void loop() {
         if (p[1]=='Y') {
 #ifdef DEBUG
           if (debug_mode) {
-            webPrintHeader();
+            //webPrintHeader();
             uint8_t type = strtol(&p[2],NULL,16);
             uint32_t c = (uint32_t)strtoul(&p[5],NULL,16);
             uint8_t param[MAX_PARAM_LEN] = { 0 };
@@ -5410,7 +5410,10 @@ void loop() {
             } else {
               data_len=msg[bus->getLen_idx()]-7;      // for yet unknow telegram types 0x12 to 0x15
             }
-            tryDecode(msg, data_len);
+            printToWebClient(tryDecode(msg, data_len));
+            printToWebClient(PSTR("<br>"));
+            printToWebClient(PSTR("<br>"));
+
 #ifdef LOGGER
             LogTelegram(msg);
 #endif
