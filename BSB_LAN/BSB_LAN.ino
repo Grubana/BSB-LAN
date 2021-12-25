@@ -4542,6 +4542,7 @@ void loop() {
 
   byte  msg[33] = { 0 };                       // response buffer
   byte  tx_msg[33] = { 0 };                    // xmit buffer
+  char  info[200] = { 0 };   
   char c = '\0';
   const byte MaxArrayElement=252;
   char  cLineBuffer[MaxArrayElement];  //
@@ -5410,12 +5411,11 @@ void loop() {
             } else {
               data_len=msg[bus->getLen_idx()]-7;      // for yet unknow telegram types 0x12 to 0x15
             }
-            const char* info = tryDecode(msg, data_len);
+            info[0] = '\0';
+            tryDecode(msg, data_len, &info);
             printToWebClient(info);
             printToWebClient(PSTR("<br>"));
             printToWebClient(PSTR("<br>"));
-
-            free((char*)info);
 #ifdef LOGGER
             LogTelegram(msg);
 #endif

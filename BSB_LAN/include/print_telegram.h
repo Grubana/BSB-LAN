@@ -630,7 +630,7 @@ void loadCategoryDescAddr() {
   decodedTelegram.value[0] = 0; //VERY IMPORTANT: reset result before decoding, in other case in case of error value from printENUM will be showed as correct value.
 }
  
-const char* tryDecode(byte* msg, byte data_len, const char* info) {
+const char* tryDecode(byte* msg, byte data_len, char* info) {
   String result = "";
   printBIT(msg,data_len);
   if(decodedTelegram.error == 0){
