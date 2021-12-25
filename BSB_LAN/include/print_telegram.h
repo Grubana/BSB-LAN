@@ -629,15 +629,14 @@ void loadCategoryDescAddr() {
   decodedTelegram.enumdescaddr = 0;
   decodedTelegram.value[0] = 0; //VERY IMPORTANT: reset result before decoding, in other case in case of error value from printENUM will be showed as correct value.
 }
-
-const char* tryDecode(byte* msg, byte data_len, const char* info){
-  *info = "";
-
+ 
+const char* tryDecode(byte* msg, byte data_len, const char* info) {
+  String result = "";
   printBIT(msg,data_len);
   if(decodedTelegram.error == 0){
-    (*info).concat("Bit: ");
-    (*info).concat(decodedTelegram.value);
-    (*info).concat("   |   ");
+    result.concat("Bit: ");
+    result.concat(decodedTelegram.value);
+    result.concat("   |   ");
   }
   Serial.print("Bit: ");
   Serial.print(decodedTelegram.value);
@@ -651,9 +650,9 @@ const char* tryDecode(byte* msg, byte data_len, const char* info){
 
   printBYTE(msg,data_len);
   if(decodedTelegram.error == 0){
-    (*info).concat("Byte: ");
-    (*info).concat(decodedTelegram.value);
-    (*info).concat("   |   ");
+    result.concat("Byte: ");
+    result.concat(decodedTelegram.value);
+    result.concat("   |   ");
   }
   Serial.print("Byte: ");
   Serial.print(decodedTelegram.value);
@@ -667,9 +666,9 @@ const char* tryDecode(byte* msg, byte data_len, const char* info){
            
   printWORD(msg,data_len,decodedTelegram.operand);
   if(decodedTelegram.error == 0){
-    (*info).concat("Word: ");
-    (*info).concat(decodedTelegram.value);
-    (*info).concat("   |   ");
+    result.concat("Word: ");
+    result.concat(decodedTelegram.value);
+    result.concat("   |   ");
   }
   Serial.print("Word: ");
   Serial.print(decodedTelegram.value);
@@ -683,9 +682,9 @@ const char* tryDecode(byte* msg, byte data_len, const char* info){
            
   printDWORD(msg,data_len,decodedTelegram.operand);
   if(decodedTelegram.error == 0){
-    (*info).concat("DWord: ");
-    (*info).concat(decodedTelegram.value);
-    (*info).concat("   |   ");
+    result.concat("DWord: ");
+    result.concat(decodedTelegram.value);
+    result.concat("   |   ");
   }
   Serial.print("DWord: ");
   Serial.print(decodedTelegram.value);
@@ -699,9 +698,9 @@ const char* tryDecode(byte* msg, byte data_len, const char* info){
            
   printSINT(msg,data_len,decodedTelegram.operand);
   if(decodedTelegram.error == 0){
-    (*info).concat("SInt: ");
-    (*info).concat(decodedTelegram.value);
-    (*info).concat("   |   ");
+    result.concat("SInt: ");
+    result.concat(decodedTelegram.value);
+    result.concat("   |   ");
   }
   Serial.print("SInt: ");
   Serial.print(decodedTelegram.value);
@@ -715,9 +714,9 @@ const char* tryDecode(byte* msg, byte data_len, const char* info){
            
   printFIXPOINT_BYTE(msg,data_len,decodedTelegram.operand,decodedTelegram.precision);
   if(decodedTelegram.error == 0){
-    (*info).concat("FIXPOINT_BYTE: ");
-    (*info).concat(decodedTelegram.value);
-    (*info).concat("   |   ");
+    result.concat("FIXPOINT_BYTE: ");
+    result.concat(decodedTelegram.value);
+    result.concat("   |   ");
   }
   Serial.print("FIXPOINT_BYTE: ");
   Serial.print(decodedTelegram.value);
@@ -731,9 +730,9 @@ const char* tryDecode(byte* msg, byte data_len, const char* info){
            
   printFIXPOINT_BYTE_US(msg,data_len,decodedTelegram.operand,decodedTelegram.precision);
   if(decodedTelegram.error == 0){
-    (*info).concat("FIXPOINT_BYTE_US: ");
-    (*info).concat(decodedTelegram.value);
-    (*info).concat("   |   ");
+    result.concat("FIXPOINT_BYTE_US: ");
+    result.concat(decodedTelegram.value);
+    result.concat("   |   ");
   }
   Serial.print("FIXPOINT_BYTE_US: ");
   Serial.print(decodedTelegram.value);
@@ -747,9 +746,9 @@ const char* tryDecode(byte* msg, byte data_len, const char* info){
            
   printFIXPOINT(msg,data_len,decodedTelegram.operand,decodedTelegram.precision);
   if(decodedTelegram.error == 0){
-    (*info).concat("FIXPOINT: ");
-    (*info).concat(decodedTelegram.value);
-    (*info).concat("   |   ");
+    result.concat("FIXPOINT: ");
+    result.concat(decodedTelegram.value);
+    result.concat("   |   ");
   }
   Serial.print("FIXPOINT: ");
   Serial.print(decodedTelegram.value);
@@ -763,9 +762,9 @@ const char* tryDecode(byte* msg, byte data_len, const char* info){
            
   printCHOICE(msg,data_len, decodedTelegram.enumstr, decodedTelegram.enumstr_len);
   if(decodedTelegram.error == 0){
-    (*info).concat("CHOICE: ");
-    (*info).concat(decodedTelegram.value);
-    (*info).concat("   |   ");
+    result.concat("CHOICE: ");
+    result.concat(decodedTelegram.value);
+    result.concat("   |   ");
   }
   Serial.print("CHOICE: ");
   Serial.print(decodedTelegram.value);
@@ -779,9 +778,9 @@ const char* tryDecode(byte* msg, byte data_len, const char* info){
            
   printLPBAddr(msg,data_len);
   if(decodedTelegram.error == 0){
-    (*info).concat("LPBAddr: ");
-    (*info).concat(decodedTelegram.value);
-    (*info).concat("   |   ");
+    result.concat("LPBAddr: ");
+    result.concat(decodedTelegram.value);
+    result.concat("   |   ");
   }
   Serial.print("LPBAddr: ");
   Serial.print(decodedTelegram.value);
@@ -795,9 +794,9 @@ const char* tryDecode(byte* msg, byte data_len, const char* info){
            
   printTime(msg,data_len);
   if(decodedTelegram.error == 0){
-    (*info).concat("Time: ");
-    (*info).concat(decodedTelegram.value);
-    (*info).concat("   |   ");
+    result.concat("Time: ");
+    result.concat(decodedTelegram.value);
+    result.concat("   |   ");
   }
   Serial.print("Time: ");
   Serial.print(decodedTelegram.value);
@@ -811,9 +810,9 @@ const char* tryDecode(byte* msg, byte data_len, const char* info){
            
   printDateTime(msg,data_len, decodedTelegram.type);
   if(decodedTelegram.error == 0){
-    (*info).concat("DateTime: ");
-    (*info).concat(decodedTelegram.value);
-    (*info).concat("   |   ");
+    result.concat("DateTime: ");
+    result.concat(decodedTelegram.value);
+    result.concat("   |   ");
   }
   Serial.print("DateTime: ");
   Serial.print(decodedTelegram.value);
@@ -827,9 +826,9 @@ const char* tryDecode(byte* msg, byte data_len, const char* info){
            
   printTimeProg(msg,data_len);
   if(decodedTelegram.error == 0){
-    (*info).concat("TimeProg: ");
-    (*info).concat(decodedTelegram.value);
-    (*info).concat("   |   ");
+    result.concat("TimeProg: ");
+    result.concat(decodedTelegram.value);
+    result.concat("   |   ");
   }
   Serial.print("TimeProg: ");
   Serial.print(decodedTelegram.value);
@@ -857,16 +856,19 @@ const char* tryDecode(byte* msg, byte data_len, const char* info){
     decodedTelegram.error = 256;
   }
   if(decodedTelegram.error == 0){
-    (*info).concat("String: ");
-    (*info).concat(decodedTelegram.value);
-    (*info).concat("   |   ");
+    result.concat("String: ");
+    result.concat(decodedTelegram.value);
+    result.concat("   |   ");
   }
   Serial.print("String: ");
   Serial.print(decodedTelegram.value);
   Serial.print(" (");
   Serial.print(decodedTelegram.error);
   Serial.println(")");
-                
+  Serial.println("TEST: "+result);
+              
+  strcpy(info, result.c_str());
+    
               /*
             case VT_WEEKDAY:
             case VT_ENUM: // enum
