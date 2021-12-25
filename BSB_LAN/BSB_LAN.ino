@@ -1751,6 +1751,7 @@ void SerialPrintType(byte type) {
  *
  * *************************************************************** */
 void prepareToPrintHumanReadableTelegram(byte *msg, byte data_len, int shift) {
+  return;
   SerialPrintData(msg);
   decodedTelegram.telegramDump = (char *) malloc(data_len * 2 + 1); //two chars per telegram byte + zero
   if (decodedTelegram.telegramDump) {
