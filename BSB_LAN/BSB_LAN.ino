@@ -5412,10 +5412,10 @@ void loop() {
             }
             const char* info = tryDecode(msg, data_len);
             printToWebClient(info);
-            free((char*)info);
             printToWebClient(PSTR("<br>"));
             printToWebClient(PSTR("<br>"));
 
+            free((char*)info);
 #ifdef LOGGER
             LogTelegram(msg);
 #endif
