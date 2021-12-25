@@ -2534,7 +2534,7 @@ bool SaveConfigFromRAMtoEEPROM() {
   }
   // EEPROM dump require ~3 sec so let it be last operation.
   // Dump when serial debug active or have telnet client
-  EEPROM_dump();
+  //EEPROM_dump();
 
   if (buschanged) {
     setBusType();
@@ -6111,7 +6111,7 @@ void loop() {
               flushToWebClient();
 // EEPROM dump require ~3 sec so let it be last operation.
 // Dump when serial debug active or have telnet client
-              EEPROM_dump();
+              //EEPROM_dump();
               break;
             }
           break;
